@@ -1,15 +1,15 @@
-one:
+logo_web:
   bubble: logo
-  tag: one
+  tag: web
 
-two:
+layout_web:
   bubble: layout
-  tag: two
+  tag: web
 
-three:
+layout_mobile:
   bubble: layout
-  tag: one
+  tag: mobile
 
-four:
+text_mobile:
   bubble: text
-  tag: two
+  tag: mobile
