@@ -27,4 +27,8 @@ export default class extends Controller {
   close() {
     this.dialogTarget.close()
   }
+
+  closeOnClickOutside({ target }) {
+    if (!this.element.contains(target)) this.close()
+  }
 }

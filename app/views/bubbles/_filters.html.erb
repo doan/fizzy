@@ -1,5 +1,5 @@
 <h1 class="txt-large">
-  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close">
+  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close click@document->dialog#closeOnClickOutside">
     <button class="btn btn--plain filter__button" data-action="click->dialog#toggle" data-dialog-modal-value="true">
       <% if params[:popped] %>
         Popped
@@ -22,7 +22,7 @@
 
   in
 
-  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close">
+  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close click@document->dialog#closeOnClickOutside">
     <button class="btn btn--plain filter__button" data-action="click->dialog#toggle" data-dialog-modal-value="true">
       <%= bucket.name %>
     </button>
@@ -40,7 +40,7 @@
 <h2 class="txt-medium">
   <%= tag ? "Tagged" : "with" %>
 
-  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close">
+  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close click@document->dialog#closeOnClickOutside">
     <button class="btn btn--plain filter__button" data-action="click->dialog#toggle" data-dialog-modal-value="true">
       <%= tag&.title || "any tag" %>
     </button>
@@ -63,7 +63,7 @@
 
   and
 
-  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close">
+  <div class="filter" data-controller="dialog" data-action="keydown.esc->dialog#close click@document->dialog#closeOnClickOutside">
     <button class="btn btn--plain filter__button" data-action="click->dialog#toggle" data-dialog-modal-value="true">
       assigned to <%= assignee&.name || "anyone" %>
     </button>
