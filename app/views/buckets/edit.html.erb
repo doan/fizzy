@@ -2,7 +2,7 @@
 
 <% content_for :header do %>
   <nav>
-    <%= link_to buckets_path, class: "btn flex-item-justify-start" do %>
+    <%= link_to bucket_bubbles_path(@bucket), class: "btn flex-item-justify-start" do %>
       <%= image_tag "arrow-left.svg", aria: { hidden: true }, size: 24 %>
       <span class="for-screen-reader">Go back</span>
     <% end %>
@@ -17,11 +17,36 @@
 <% end %>
 
 <div class="panel shadow center" style="--panel-size: 55ch; view-transition-name: new-bucket">
-  <%= form_with model: @bucket, class: "flex flex-column gap txt-large" do |form| %>
+  <%= form_with model: @bucket, class: "flex flex-column gap txt-large", controller: "form" do |form| %>
     <%= image_tag "bubbles.svg", aria: { hidden: "true" }, size: 150, class: "colorize--black center" %>
-    <label class="flex align-center gap">
-      <%= form.text_field :name, required: true, class: "input full-width", autofocus: true, placeholder: "Give it a name…" %>
-    </label>
+
+    <div class="flex align-center gap">
+      <%= translation_button(:bucket_name) %>
+
+      <label class="flex-item-grow txt-large">
+        <%= form.text_field :name, name: "bucket[name]", class: "input full-width",
+              required: true, autofocus: true, placeholder: "Give it a name…",
+              data: { action: "keydown.enter->form#submit:prevent" } %>
+      </label>
+    </div>
+
+    <section class="margin-block pad-inline fill-shade border-radius">
+      <menu class="flex flex-column gap margin-none pad overflow-y constrain-height" data-controller="filter" data-filter-active-class="filter--active" data-filter-selected-class="selected">
+        <% if User.active.count > 20 %>
+          <input placeholder="Filter…" class="input input--transparent full-width" type="search" autocorrect="off" autocomplete="off" data-1p-ignore="true" data-action="input->filter#filter">
+        <% end %>
+
+        <div data-filter-target="list">
+          <%= render partial: "buckets/user_toggle", collection: @selected_users, as: :user, locals: { bucket: @bucket, selected: true } %>
+
+          <% if @selected_users.any? && @unselected_users.any? %>
+            <hr class="separator full-width" style="--border-style: solid">
+          <% end %>
+
+          <%= render partial: "buckets/user_toggle", collection: @unselected_users, as: :user, locals: { bucket: @bucket, selected: false } %>
+        </div>
+      </menu>
+    </section>
 
     <button type="submit" id="log_in" class="btn btn--reversed center">
       <%= image_tag "check.svg", aria: { hidden: true }, size: 24 %>

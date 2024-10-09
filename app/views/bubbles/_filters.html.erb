@@ -34,6 +34,11 @@
         <% end %>
       </menu>
     </dialog>
+
+    <%= link_to edit_bucket_url(bucket), class: "btn btn--plain", style: "font-size: 0.25em;" do %>
+      <%= image_tag "pencil.svg", aria: { hidden: true }, size: 24 %>
+      <span class="for-screen-reader">Edit</span>
+    <% end %>
   </div>
 </h1>
 

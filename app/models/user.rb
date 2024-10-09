@@ -19,6 +19,7 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(value) { value.strip.downcase }
 
   scope :active, -> { where(active: true) }
+  scope :alphabetically, -> { order("LOWER(name)") }
 
   def initials
     name.to_s.scan(/\b\p{L}/).join.upcase

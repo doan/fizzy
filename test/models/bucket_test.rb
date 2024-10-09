@@ -1,7 +1,8 @@
 require "test_helper"
 
 class BucketTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "revising access" do
+    buckets(:writebook).accesses.revise granted: users(:david, :jz), revoked: users(:kevin)
+    assert_equal users(:david, :jz), buckets(:writebook).users
+  end
 end

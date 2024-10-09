@@ -8,6 +8,16 @@
   }
 }
 
+.filter--active {
+  li {
+    display: none;
+
+    &.selected {
+      display: flex;
+    }
+  }
+}
+
 .filter__button {
   --hover-size: 0;
 
