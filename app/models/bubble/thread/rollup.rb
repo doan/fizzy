@@ -18,10 +18,6 @@ class Bubble::Thread::Rollup
 
     delegate :time_ago_in_words, to: "ApplicationController.helpers", private: true
 
-    def first_position?
-      first_position
-    end
-
     def collapsed_entries
       sorted_entries.chunk_while { |a, b| repeated_boosts?(a, b) }.map { |chunk| [ chunk.last, chunk.size ] }
     end
@@ -51,5 +47,9 @@ class Bubble::Thread::Rollup
       when "boosted"
         "#{entry.creator.name} +#{chunk_size}"
       end
+    end
+
+    def first_position?
+      first_position
     end
 end
