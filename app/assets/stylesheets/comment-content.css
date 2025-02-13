@@ -43,7 +43,7 @@
     font-size: 0.85em;
   }
   
-  :where(pre) {
+  :is(pre) {
     overflow-x: auto;
     text-wrap: nowrap;
   }
