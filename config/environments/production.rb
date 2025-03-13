@@ -50,9 +50,6 @@ Rails.application.configure do
                                        .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
                                        .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
 
-  # No normal logs. Suppress everything that's not structured.
-  config.log_level = :fatal
-
   # Structured JSON logging
   config.structured_logging.logger = ActiveSupport::Logger.new(STDOUT)
 
