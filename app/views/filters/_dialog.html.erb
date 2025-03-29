@@ -45,6 +45,7 @@
               <span>All Collections</span>
             <% end %>
           </li>
+
           <% Current.user.buckets.order(:name).each do |bucket| %>
             <li>
               <%= label_tag "bucket_ids_#{bucket.id}", class: "btn filter__button" do %>
@@ -95,6 +96,7 @@
         <% if (tags = Current.account.tags.order(:title)).any? %>
           <div class="filter__menu" role="group" aria-label="Tagged">
             <div class="filter__label"><strong>Tagged</strong></div>
+            
             <% tags.each do |tag| %>
               <div>
                 <label class="btn filter__button">
@@ -109,17 +111,18 @@
 
         <div class="filter__menu" role="group" aria-label="Assigned to…">
           <div class="filter__label"><strong>Assigned to…</strong></div>
+
           <div>
             <label class="btn filter__button">
               <%= check_box_tag "assignment_status", "unassigned", filter.assignment_status.unassigned?,
-                    class: "visually-hidden",
-                    data: {
+                    class: "visually-hidden", data: {
                       action: "filter-form#clearCategory", 
                       filter_form_name_param: "assignee_ids[],assigner_ids[]" } %>
               <span>No one</span>
               <%= image_tag "close.svg", aria: { hidden: true }, size: 24 %>
             </label>
           </div>
+
           <div>
             <label class="btn filter__button">
               <%= check_box_tag "assignee_ids[]", Current.user.id, filter.assignees.include?(Current.user),
@@ -129,6 +132,7 @@
               <%= image_tag "close.svg", aria: { hidden: true }, size: 24 %>
             </label>
           </div>
+
           <% Current.account.users.active.without(Current.user).order(:name).each do |user| %>
             <div>
               <label class="btn filter__button">
@@ -143,6 +147,7 @@
 
         <div class="filter__menu" role="group" aria-label="Added by…">
           <div class="filter__label"><strong>Added by…</strong></div>
+
           <div>
             <label class="btn filter__button">
               <%= check_box_tag "creator_ids[]", Current.user.id, filter.creators.include?(Current.user),
@@ -151,6 +156,7 @@
               <%= image_tag "close.svg", aria: { hidden: true }, size: 24 %>
             </label>
           </div>
+
           <% Current.account.users.active.without(Current.user).order(:name).each do |user| %>
             <div>
               <label class="btn filter__button">
