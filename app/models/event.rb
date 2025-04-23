@@ -16,6 +16,14 @@ class Event < ApplicationRecord
     super.inquiry
   end
 
+  def target
+    if action.commented?
+      comment
+    else
+      card
+    end
+  end
+
   def initial_assignment?
     action == "published" && card.assigned_to?(creator)
   end

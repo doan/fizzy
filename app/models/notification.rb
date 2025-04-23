@@ -21,6 +21,14 @@ class Notification < ApplicationRecord
     read_at.present?
   end
 
+  def target
+    if source.is_a?(Event)
+      source.target
+    else
+      source
+    end
+  end
+
   private
     def broadcast_unread
       broadcast_prepend_later_to user, :notifications, target: "notifications"

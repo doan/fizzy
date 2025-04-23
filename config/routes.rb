@@ -108,17 +108,7 @@ Rails.application.routes.draw do
   end
 
   resolve "Notification" do |notification, options|
-    source = if notification.source.is_a?(Event)
-      if notification.source.action.commented?
-        notification.source.comment
-      else
-        notification.source.card
-      end
-    else
-      notification.source
-    end
-
-    polymorphic_path(source, options)
+    polymorphic_path(notification.target, options)
   end
 
   get "up", to: "rails/health#show", as: :rails_health_check
