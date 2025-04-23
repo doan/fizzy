@@ -1,7 +1,22 @@
-<%= form_with url: cards_path, method: :get, class: "flex flex-column max-width popup__list",
+<%= form_with url: cards_path, method: :get, class: "flex flex-column max-width popup__list full-width",
       data: { controller: "form" } do |form| %>
   <% filter.as_params.except(:collection_ids).each do |key, value| %>
     <%= filter_hidden_field_tag key, value %>
+  <% end %>
+
+  <%= link_to cards_path(filter.as_params.except(:collection_ids)), class: "popup__group flex align-center", style: "--hover-size: 0" do %>
+    <div class="btn txt-xx-small flex-item-no-shrink">
+      <input type="checkbox" <%= "checked" if filter.collection_ids.empty? %>>
+
+      <span class="for-screen-reader">
+        See everything in all collections
+      </span>
+      <%= icon_tag "check", size: 18, class: "checked" %>
+    </div>
+    <%= tag.div class: "btn popup__item min-width flex-item-grow" do %>
+      <span class="overflow-ellipsis">All collections</span>
+    <% end %>
+    <span class="translucent flex-item-no-shrink"> ›</span>
   <% end %>
 
   <% Current.user.collections.order(:name).each do |collection| %>
@@ -19,7 +34,7 @@
         <%= icon_tag "check", size: 18, class: "checked" %>
       </div>
 
-      <%= link_to cards_path(collection_ids: [ collection ]), class: "btn popup__item min-width" do %>
+      <%= link_to cards_path(collection_ids: [ collection ]), class: "btn popup__item min-width flex-item-grow" do %>
         <span class="overflow-ellipsis"><%= collection.name %></span>
       <% end %>
   

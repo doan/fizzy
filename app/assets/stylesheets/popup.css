@@ -6,7 +6,7 @@
 
     inline-size: auto;
     inset: 0 auto auto 50%;
-    min-inline-size: min(20ch, 90vw);
+    min-inline-size: min(25ch, 90vw);
     max-inline-size: min(50ch, 90vw);
     position: absolute;
     transform: translateX(-50%);
