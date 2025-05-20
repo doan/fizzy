@@ -208,10 +208,6 @@
     .card__notification-meta {
       font-size: var(--text-x-small);
     }
-
-    .card__timestamp {
-      display: none;
-    }
   }
 
   /* Pins

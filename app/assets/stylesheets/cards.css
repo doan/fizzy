@@ -241,7 +241,6 @@
   }
 
   .card__timestamp {
-    font-size: var(--text-small);
     opacity: 0.66;
   }
 
