@@ -1,15 +1,17 @@
 <%= turbo_stream_from Current.user, :notifications %>
 
-<dialog class="tray tray--notifications"
-    data-controller="dialog" data-dialog-modal-value="false" data-dialog-target="dialog"
-    data-action="keydown.esc->dialog#close:stop click@document->dialog#closeOnClickOutside">
-  <%= turbo_frame_tag "notifications", src: tray_notifications_path, refresh: "morph" %>
+<section class="tray tray--notifications">
+  <dialog class="tray__dialog"
+      data-controller="dialog" data-dialog-modal-value="false" data-dialog-target="dialog"
+      data-action="keydown.esc->dialog#close:stop click@document->dialog#closeOnClickOutside">
+    <%= turbo_frame_tag "notifications", src: tray_notifications_path, refresh: "morph" %>
 
-  <div class="tray__item tray__item--overflow">
-    <%= link_to notifications_path, class: "card", data: { action: "click->dialog#close" } do %>
-      + More…
-    <% end %>
-  </div>
+    <div class="tray__item tray__item--overflow">
+      <%= link_to notifications_path, class: "card", data: { action: "click->dialog#close" } do %>
+        + More…
+      <% end %>
+    </div>
+  </dialog>
 
   <div class="tray__actions">
     <%= button_to read_all_notifications_path,
@@ -26,4 +28,4 @@
   </div>
 
   <button class="tray__expander" data-action="dialog#toggle" aria-label="Expand notifications stack"></button>
-</dialog>
+</section>

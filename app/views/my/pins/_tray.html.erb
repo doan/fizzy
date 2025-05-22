@@ -1,13 +1,16 @@
 <%= turbo_stream_from Current.user, :pins_tray %>
 
-<%= tag.dialog id: "pin-tray", class: "tray tray--pins",
-      data: { controller: "dialog", turbo_permanent: true, dialog_modal_value: false, dialog_target: "dialog", action: "keydown.esc->dialog#close:stop click@document->dialog#closeOnClickOutside" } do %>
-  <%= turbo_frame_tag "pins", src: my_pins_path %>
+<section class="tray tray--pins">
+  <%= tag.dialog id: "pin-tray", class: "tray__dialog",
+        data: { controller: "dialog", turbo_permanent: true, dialog_modal_value: false, dialog_target: "dialog", action: "keydown.esc->dialog#close:stop click@document->dialog#closeOnClickOutside" } do %>
+    <%= turbo_frame_tag "pins", src: my_pins_path %>
+  <% end %>
 
   <div class="tray__actions">
-    <button class="txt-uppercase btn btn--reversed borderless fill-transparent txt-x-small translucent center full-width" data-action="click->dialog#close">Pinned</button>
+    <button class="txt-uppercase btn btn--reversed borderless fill-transparent txt-x-small translucent center full-width" data-action="click->dialog#close">
+      Pinned
+    </button>
   </div>
 
-  <button class="tray__expander" data-action="dialog#toggle" aria-label="Expand pins stack">
-  </button>
-<% end %>
+  <button class="tray__expander" data-action="dialog#toggle" aria-label="Expand pins stack"></button>
+</section>

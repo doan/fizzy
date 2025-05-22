@@ -48,9 +48,9 @@
 
       <% if Current.user && !@hide_footer_frames %>
         <div id="footer_frames" data-turbo-permanent="true" >
-          <%= render "notifications/tray" %>
           <%= render "my/pins/tray" %>
           <%= render "commands/terminal" %>
+          <%= render "notifications/tray" %>
         </div>
       <% end %>
     </footer>
