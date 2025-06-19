@@ -342,11 +342,16 @@
 
   .attachment--custom,
   action-text-attachment {
-    --attachment-image-size: 24px;
+    --attachment-image-size: 1em;
+
+    align-items: center;
+    display: inline-flex;
+    gap: 0.25ch;
+    vertical-align: bottom;
 
     img {
       block-size: var(--attachment-image-size);
-      display: inline;
+      border-radius: 50%;
       inline-size: var(--attachment-image-size);
     }
   }

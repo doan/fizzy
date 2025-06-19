@@ -145,7 +145,6 @@
 
   .lexical-prompt-menu {
     --lexical-prompt-avatar-size: 24px;
-    --lexical-prompt-min-height: 5lh;
     --lexical-prompt-min-width: 20ch;
     --lexical-prompt-padding: 0.5ch;
 
@@ -155,7 +154,6 @@
     font-size: var(--text-small);
     list-style: none;
     margin: 0;
-    min-block-size: var(--lexical-prompt-min-height);
     min-inline-size: var(--lexical-prompt-min-width);
     padding: var(--lexical-prompt-padding);
     visibility: hidden;
