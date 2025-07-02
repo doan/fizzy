@@ -3,8 +3,8 @@ class Prompts::CommandsController < ApplicationController
     @commands = [
       [ "/add_card", "Add a new card", "/add_card " ],
       [ "/assign", "Assign cards to people", "/assign @" ],
-      [ "/clear", "Clear all filters", "/clear" ],
       [ "/close", "Close cards (with optional reason)", "/close " ],
+      [ "/clear", "Clear all filters", "/clear" ],
       [ "/consider", "Move cards back to Considering", "/consider" ],
       [ "/do", "Move cards to Doing", "/do" ],
       [ "/reconsider", "Move cards back to Considering", "/reconsider" ],
