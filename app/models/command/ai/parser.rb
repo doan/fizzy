@@ -30,7 +30,7 @@ class Command::Ai::Parser
         commands.unshift Command::VisitUrl.new(user: user, url: query_context.url, context: resolved_context)
       end
 
-      Command::Composite.new(title: query, commands: commands, user: user, line: query, context: resolved_context)
+      Command::Composite.new(title: query, commands: commands, user: user, line: normalized_query, context: resolved_context)
     end
 
     def commands_from_query(normalized_query, context)

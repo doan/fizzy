@@ -17,30 +17,16 @@ class Command::Parser
   end
 
   private
-    def as_plain_text_with_attachable_references(string)
-      ActionText::Content.new(string).render_attachments(&:to_gid).fragment.to_plain_text
-    end
-
     def as_plain_text(string)
       ActionText::Content.new(string).to_plain_text
     end
 
     def parse_command(string)
-      rich_text_command = as_plain_text_with_attachable_references(string)
-      plain_text_command = as_plain_text(string)
-
-      parse_plain_text_command(plain_text_command) || parse_rich_text_command(rich_text_command)
+      parse_rich_text_command as_plain_text_with_attachable_references(string)
     end
 
-    def parse_plain_text_command(string)
-      command_name, *_ = string.strip.split(" ")
-
-      case command_name
-      when /^#/
-        Command::FilterByTag.new(tag_title: tag_title_from(string), params: filter.as_params)
-      when /^@/
-        Command::GoToUser.new(user_id: context.find_user(command_name)&.id)
-      end
+    def as_plain_text_with_attachable_references(string)
+      ActionText::Content.new(string).render_attachments(&:to_gid).fragment.to_plain_text
     end
 
     def parse_rich_text_command(string)
@@ -48,6 +34,10 @@ class Command::Parser
       combined_arguments = command_arguments.join(" ")
 
       case command_name
+      when /^#/
+        Command::FilterByTag.new(tag_title: tag_title_from(string), params: filter.as_params)
+      when /^@/
+        Command::GoToUser.new(user_id: context.find_user(command_name)&.id)
       when "/user"
         Command::GoToUser.new(user_id: context.find_user(combined_arguments)&.id)
       when "/assign", "/assignto"
