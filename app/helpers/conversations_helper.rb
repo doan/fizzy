@@ -1,5 +1,7 @@
 module ConversationsHelper
   def conversation_previous_page_link(message, **options)
+    return unless message
+
     url = conversation_messages_path(before: message)
 
     options[:id] ||= dom_id(message.conversation, :load_more)
