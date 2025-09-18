@@ -1,4 +1,4 @@
-<section id="doing-cards" class="cards cards--doing <%= "is-collapsed" unless last %>" style="--card-color: <%= stage.color if defined?(stage) && stage %>"
+<section id="doing-cards" class="cards cards--doing is-collapsed" style="--card-color: <%= stage.color if defined?(stage) && stage %>"
     data-controller="toggle-class" data-toggle-class-toggle-class="is-collapsed">
   <% 
     filtered_records = if defined?(stage) && stage
@@ -9,7 +9,7 @@
   %>
 
   <div class="cards__expander btn btn--plain">
-    <strong class="font-weight-black expander__count"><%= filtered_records.count %></strong>
+    <strong class="font-weight-black cards__expander-count"><%= filtered_records.count %></strong>
     <button class="btn btn--plain cards__expander-button txt-uppercase" data-action="toggle-class#toggle"><%= stage.name if defined?(stage) && stage %></button>
   </div>
 

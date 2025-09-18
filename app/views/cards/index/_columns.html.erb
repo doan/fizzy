@@ -5,10 +5,10 @@
 
       <% if workflow = user_filtering.single_collection.workflow %>
         <% workflow.stages.each do |stage| %>
-          <%= render "cards/index/engagement/doing", user_filtering: user_filtering, **doing.to_h, stage: stage, last: stage == workflow.stages.last %>
+          <%= render "cards/index/engagement/doing", user_filtering: user_filtering, **doing.to_h, stage: stage%>
         <% end %>
       <% else %>
-        <%= render "cards/index/engagement/doing", user_filtering: user_filtering, **doing.to_h, last: false %>
+        <%= render "cards/index/engagement/doing", user_filtering: user_filtering, **doing.to_h %>
       <% end %>
     </div>
 
