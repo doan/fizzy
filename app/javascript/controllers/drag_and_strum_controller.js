@@ -1,6 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { post } from "@rails/request.js"
-import { nextFrame } from "helpers/timing_helpers"
 
 const MANDOLIN_NOTES = [
   "/audio/mandolin/B3.mp3",
