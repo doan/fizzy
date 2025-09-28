@@ -1,7 +1,11 @@
 class Collections::ColumnsController < ApplicationController
   include ActionView::RecordIdentifier, CollectionScoped
 
-  before_action :set_column, only: [:show, :update]
+  before_action :set_column, only: [:show, :update, :destroy]
+
+  def show
+    set_page_and_extract_portion_from @column.cards.active.reverse_chronologically
+  end
 
   def create
     @column = @collection.columns.create!(column_params)
@@ -13,8 +17,9 @@ class Collections::ColumnsController < ApplicationController
     render turbo_stream: turbo_stream.replace(dom_id(@column), partial: "collections/show/column", method: :morph, locals: { column: @column })
   end
 
-  def show
-    set_page_and_extract_portion_from @column.cards.active.reverse_chronologically
+  def destroy
+    @column.destroy
+    render turbo_stream: turbo_stream.remove(dom_id(@column))
   end
 
   private
