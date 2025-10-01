@@ -345,7 +345,30 @@
         }
       }
 
-      &:nth-child(1n + 11) { display: none; }
+      /* Show 6 max items on smallest devices */
+      @media (max-height: 578px) {
+        &:nth-child(1n + 7) { display: none; }
+      }
+
+      /* 7 max */
+      @media (min-height: 578px) and (max-height: 656px) {
+        &:nth-child(1n + 8) { display: none; }
+      }
+
+      /* 8 max */
+      @media (min-height: 656px) and (max-height: 734px) {
+        &:nth-child(1n + 9) { display: none; }
+      }
+
+      /* 9 max */
+      @media (min-height: 734px) and (max-height: 812px) {
+        &:nth-child(1n + 10) { display: none; }
+      }
+
+      /* 10 max on larger screens */
+      @media (min-height: 812px) {
+        &:nth-child(1n + 11) { display: none; }
+      }
 
       &:not([aria-selected]) .card__link:focus-visible,
       .tray__dialog:not([open]) & .card__link:focus-visible {
