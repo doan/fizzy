@@ -591,7 +591,10 @@
 
     border: 1px solid var(--border-color);
     text-align: center;
-    z-index: 5;
+
+    &:has(dialog[open]) {
+      z-index: 5;
+    }
 
     .separator--horizontal {
       margin-block: var(--block-space);
