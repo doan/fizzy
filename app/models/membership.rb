@@ -1,23 +1,23 @@
 class Membership < UntenantedRecord
   belongs_to :identity, touch: true
-  has_many :magic_links, dependent: :delete_all
 
-  # I want this to be `belongs_to :user`, but ActiveRecord::Tenanted doesn't yet support
-  # associations from untenanted to untenanted models.
-  #
-  # See https://github.com/basecamp/activerecord-tenanted/issues/201
-  #
-  # In the meantime, when creating a Membership, specify both `user_id` and `user_tenant` attributes.
+  class << self
+    def change_email_address(from:, to:, tenant:)
+      identity = Identity.find_by(email_address: from)
+      membership = find_by(tenant: tenant, identity: identity)
+
+      if membership
+        new_identity = Identity.find_or_create_by!(email_address: to)
+        membership.update!(identity: new_identity)
+      end
+    end
+  end
+
   def user
-    User.with_tenant(user_tenant) { User.find_by(id: user_id) }
+    User.with_tenant(tenant) { User.find_by(email_address: identity.email_address) }
   end
 
   def account
-    Account.with_tenant(user_tenant) { Account.sole }
-  end
-
-  def send_magic_link
-    magic_link = magic_links.create!
-    MagicLinkMailer.sign_in_instructions(magic_link).deliver_later
+    Account.with_tenant(tenant) { Account.sole }
   end
 end

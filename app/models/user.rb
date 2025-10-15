@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   include Accessor, Assignee, Attachable, Configurable, Identifiable,
-    Mentionable, Named, Notifiable, Role, Searcher, Staff, Transferable,
+    Invitable, Mentionable, Named, Notifiable, Role, Searcher, Staff, Transferable,
     Watcher
   include Timelined # Depends on Accessor
 

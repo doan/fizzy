@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   namespace :account do
-    resource :join_code
+    resource :join_code, only: %i[ show edit update destroy ]
     resource :settings
     resource :entropy_configuration
   end
