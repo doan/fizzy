@@ -3,9 +3,6 @@ class Membership < UntenantedRecord
 
   belongs_to :identity, touch: true
 
-  serialize :context, coder: JSON
-  store_accessor :context, :join_code
-
   class << self
     def change_email_address(from:, to:, tenant:)
       identity = Identity.find_by(email_address: from)

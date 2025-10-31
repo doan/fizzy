@@ -30,9 +30,9 @@ ActiveRecord::Schema[8.2].define(version: 2025_10_27_131911) do
   end
 
   create_table "memberships", force: :cascade do |t|
-    t.text "context"
     t.datetime "created_at", null: false
     t.integer "identity_id", null: false
+    t.string "join_code"
     t.string "tenant", null: false
     t.datetime "updated_at", null: false
     t.index ["identity_id"], name: "index_memberships_on_identity_id"
