@@ -34,7 +34,6 @@ module Authorization
       if Current.account.nil?
         redirect_to session_menu_url(script_name: nil)
       elsif Current.membership.blank?
-        Rails.logger.debug "MIKE: blank membership, session is #{Current.session.inspect}"
         redirect_to session_menu_url(script_name: nil)
       elsif Current.user.nil? && Current.membership.join_code.present?
         redirect_to new_users_join_path

@@ -24,7 +24,6 @@ module AccountSlug
 
         # Stash the account's Queenbee ID.
         env["fizzy.external_account_id"] = AccountSlug.decode($2)
-        Rails.logger.debug "MIKE: Extracted account id #{env["fizzy.external_account_id"].inspect}"
       end
 
       @app.call env
