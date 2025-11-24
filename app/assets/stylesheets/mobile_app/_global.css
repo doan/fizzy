@@ -1,6 +1,3 @@
 @layer mobile_app {
     /* Mobile app only styles go here */
-    * {
-        color: red !important;
-    }
 }
