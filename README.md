@@ -79,6 +79,11 @@ puts "VAPID_PUBLIC_KEY=#{vapid_key.public_key}"
 
 This gem depends on some private git repositories and it is not meant to be used by third parties. But we hope it can serve as inspiration for anyone wanting to run fizzy on their own infrastructure.
 
+
+## Contributing
+
+We welcome contributions! Please read our [style guide](STYLE.md) before submitting code.
+
 ## License
 
 Fizzy is released under the [O'Saasy License](LICENSE.md).
