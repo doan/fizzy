@@ -405,6 +405,10 @@
           opacity: 1;
         }
       }
+
+      [aria-busy] & {
+        position: absolute !important;
+      }
     }
 
     .avatar,
