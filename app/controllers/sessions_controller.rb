@@ -9,17 +9,20 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if magic_link = magic_link_from_sign_in_or_sign_up
-      serve_development_magic_link magic_link
+    magic_link = magic_link_from_sign_in_or_sign_up
+    serve_development_magic_link magic_link
 
-      respond_to do |format|
-        format.html { redirect_to_session_magic_link magic_link }
-        format.json { render json: { pending_authentication_token: pending_authentication_token_for(email_address) }, status: :created }
+    respond_to do |format|
+      format.html do
+        if magic_link.present?
+          redirect_to_session_magic_link magic_link 
+        else
+          redirect_to session_magic_link_path
+        end
       end
-    else
-      respond_to do |format|
-        format.html { redirect_to session_magic_link_path }
-        format.json { render json: { pending_authentication_token: pending_authentication_token_for(email_address) }, status: :created }
+
+      format.json do 
+        render json: { pending_authentication_token: pending_authentication_token_for(email_address) }, status: :created 
       end
     end
   end
