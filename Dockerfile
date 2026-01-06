@@ -66,6 +66,11 @@ ARG OCI_SOURCE
 LABEL org.opencontainers.image.source="${OCI_SOURCE}"
 LABEL org.opencontainers.image.licenses="O'Saasy"
 
+# --- ADD THIS BLOCK ---
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=5 \
+  CMD curl -f http://localhost:3000/up || exit 1
+# --- END BLOCK ---
+
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
