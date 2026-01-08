@@ -214,6 +214,10 @@ module Import
         prefix = extract_bug_feature_prefix(tags_json)
         title = prefix ? "[#{prefix}] #{task_name}" : task_name
 
+        # Set Current.user for event tracking
+        old_current_user = Current.user
+        Current.user = system_user
+
         # Create card
         card = board.cards.build(
           account: account,
@@ -320,6 +324,9 @@ module Import
 
         Rails.logger.debug "Created card #{card.number} from ClickUp task #{imported_task.external_id}"
         card
+      ensure
+        # Restore Current.user
+        Current.user = old_current_user
       end
 
       def extract_bug_feature_prefix(tags_json)
