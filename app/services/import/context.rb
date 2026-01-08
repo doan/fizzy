@@ -9,7 +9,9 @@ module Import
         if Rails.env.production?
           Account.find_by!(name: PRODUCTION_ACCOUNT_NAME)
         else
-          Account.first or raise "No accounts found"
+          # In development, prefer an account with a system user
+          account_with_system = Account.joins(:users).where(users: { role: :system }).first
+          account_with_system || Account.first or raise "No accounts found"
         end
       end
     end
