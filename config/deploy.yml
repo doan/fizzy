@@ -1,5 +1,6 @@
 service: fizzy
 image: ghcr.io/doan/fizzy
+repository: git@github.com:doan/fizzy.git
 
 servers:
   web:
