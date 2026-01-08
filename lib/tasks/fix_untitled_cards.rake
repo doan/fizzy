@@ -47,6 +47,8 @@ namespace :clickup do
       end
 
       new_title = prefix ? "[#{prefix}] #{task_name}" : task_name
+      # Truncate to 255 characters (database limit)
+      new_title = new_title[0, 255] if new_title.length > 255
       card.update!(title: new_title)
       updated += 1
     end
