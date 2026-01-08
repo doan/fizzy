@@ -12,6 +12,11 @@ namespace :clickup do
     require "csv"
     require "json"
 
+    account = Import::Context.account
+    system_user = account.system_user
+    old_current_user = Current.user
+    Current.user = system_user
+
     updated = 0
     skipped = 0
 
@@ -45,6 +50,8 @@ namespace :clickup do
       card.update!(title: new_title)
       updated += 1
     end
+
+    Current.user = old_current_user
 
     puts "✅ Updated #{updated} card titles"
     puts "   Skipped #{skipped} cards (already have titles)"
