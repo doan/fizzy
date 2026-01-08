@@ -36,7 +36,11 @@ echo ""
 echo "📊 Running import..."
 echo ""
 
-# Run the import using bundle exec to ensure correct Ruby/gems
+# Run the import - unset mise to use Homebrew Ruby
+# This ensures we use Ruby 3.4.4 that matches the compiled gems
+unset -f mise 2>/dev/null || true
+export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:$PATH"
+
 bundle exec bin/rails runner "
   importer = Import::ClickupCsvImporter.new(csv_path: '$CSV_FILE')
   result = importer.import_all
