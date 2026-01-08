@@ -88,9 +88,9 @@ module Import
         imported_task.assign_attributes(
           folder_name: folder_name,
           list_name: list_name,
-          title: row["Task Name"] || "Untitled",
+          title: row["Task Name"] || row[" Task Name"] || "Untitled",
           description: extract_description(row),
-          status: row["Status"]&.downcase || "unknown",
+          status: (row["Status"] || row[" Status"])&.downcase || "unknown",
           priority: extract_priority(row),
           assignees: extract_assignees_text(row),
           raw_payload: row.to_h
@@ -108,7 +108,7 @@ module Import
       end
 
       def extract_folder_name(row)
-        folder_path = row["Folder Name/Path"]
+        folder_path = row["Folder Name/Path"] || row[" Folder Name/Path"]
         return nil if folder_path.blank?
 
         # Folder path might be JSON array like ["App Wars"] or just a string
@@ -122,7 +122,7 @@ module Import
       end
 
       def extract_description(row)
-        content = row["Task Content"]
+        content = row["Task Content"] || row[" Task Content"]
         return "" if content.blank? || content == "null"
 
         # ClickUp content might be markdown or HTML
@@ -130,7 +130,7 @@ module Import
       end
 
       def extract_priority(row)
-        priority = row["Priority"]
+        priority = row["Priority"] || row[" Priority"]
         return "normal" if priority.blank? || priority == "null"
 
         # ClickUp priority: 1=urgent, 2=high, 3=normal, 4=low
@@ -144,7 +144,7 @@ module Import
       end
 
       def extract_assignees_text(row)
-        assignees = row["Assignees"]
+        assignees = row["Assignees"] || row[" Assignees"]
         return "" if assignees.blank? || assignees == "[]" || assignees == "null"
 
         begin
@@ -206,11 +206,12 @@ module Import
       end
 
       def create_card_from_task(board, row, imported_task, list_name)
-        task_name = row["Task Name"] || "Untitled"
-        status = row["Status"]&.downcase || "backlog"
+        # Handle CSV headers with leading spaces
+        task_name = row["Task Name"] || row[" Task Name"] || "Untitled"
+        status = (row["Status"] || row[" Status"])&.downcase || "backlog"
 
         # Add bug/feature prefix if in tags
-        tags_json = row["Tags"]
+        tags_json = row["Tags"] || row[" Tags"]
         prefix = extract_bug_feature_prefix(tags_json)
         title = prefix ? "[#{prefix}] #{task_name}" : task_name
 
@@ -233,9 +234,10 @@ module Import
         end
 
         # Set created_at from ClickUp date
-        if row["Date Created"].present?
+        date_created = row["Date Created"] || row[" Date Created"]
+        if date_created.present?
           begin
-            created_timestamp = row["Date Created"].to_i / 1000 # Convert ms to seconds
+            created_timestamp = date_created.to_i / 1000 # Convert ms to seconds
             card.created_at = Time.at(created_timestamp)
           rescue => e
             Rails.logger.warn "Could not parse created date: #{e.message}"
@@ -243,9 +245,10 @@ module Import
         end
 
         # Set due date if present
-        if row["Due Date"].present? && row["Due Date"] != "null"
+        due_date_col = row["Due Date"] || row[" Due Date"]
+        if due_date_col.present? && due_date_col != "null"
           begin
-            due_timestamp = row["Due Date"].to_i / 1000
+            due_timestamp = due_date_col.to_i / 1000
             due_date = Time.at(due_timestamp)
             card.due_on = due_date.to_date
           rescue => e
@@ -278,7 +281,7 @@ module Import
         end
 
         # Add tags from ClickUp
-        tags_json = row["Tags"]
+        tags_json = row["Tags"] || row[" Tags"]
         if tags_json.present? && tags_json != "[]" && tags_json != "null"
           begin
             tags = JSON.parse(tags_json)
@@ -294,7 +297,7 @@ module Import
         end
 
         # Assign users (best effort - match by email or name)
-        assignees_json = row["Assignees"]
+        assignees_json = row["Assignees"] || row[" Assignees"]
         if assignees_json.present? && assignees_json != "[]" && assignees_json != "null"
           begin
             assignee_list = JSON.parse(assignees_json)
