@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Helper script to import ClickUp CSV to local Fizzy instance
+
+set -e
+
+CSV_FILE="${1:-25514952AgBalQd.csv}"
+
+if [ ! -f "$CSV_FILE" ]; then
+  echo "Error: CSV file not found: $CSV_FILE"
+  echo ""
+  echo "Usage: bin/import_clickup_local [path/to/file.csv]"
+  exit 1
+fi
+
+echo "🚀 ClickUp Local Import"
+echo "======================="
+echo ""
+echo "CSV file: $CSV_FILE"
+echo "Target: Local development database"
+echo ""
+
+# Check if we're in a Rails environment
+if [ ! -f "bin/rails" ]; then
+  echo "Error: Not in a Rails project directory"
+  exit 1
+fi
+
+# Confirm before proceeding
+read -p "⚠️  This will import data to your LOCAL database. Continue? (yes/no): " confirm
+if [ "$confirm" != "yes" ]; then
+  echo "Aborted."
+  exit 0
+fi
+
+echo ""
+echo "📊 Running import..."
+echo ""
+
+# Run the import
+bin/rails runner "
+  importer = Import::ClickupCsvImporter.new(csv_path: '$CSV_FILE')
+  result = importer.import_all
+  puts 'Import completed!'
+  puts '  Imported: ' + result[:imported].to_s
+  puts '  Skipped: ' + result[:skipped].to_s
+  puts '  Errors: ' + result[:errors].to_s
+"
+
+if [ $? -eq 0 ]; then
+  echo ""
+  echo "✅ Import completed successfully!"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Start your local server: bin/dev"
+  echo "  2. Check http://fizzy.localhost:3006"
+  echo "  3. Verify boards and cards were created correctly"
+else
+  echo ""
+  echo "❌ Import failed"
+  echo "Check the error messages above for details"
+  exit 1
+fi

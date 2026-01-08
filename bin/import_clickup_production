@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Helper script to import ClickUp CSV to production Fizzy instance
+
+set -e
+
+CSV_FILE="${1:-25514952AgBalQd.csv}"
+REMOTE_PATH="/tmp/clickup_import_$(date +%s).csv"
+
+if [ ! -f "$CSV_FILE" ]; then
+  echo "Error: CSV file not found: $CSV_FILE"
+  echo ""
+  echo "Usage: bin/import_clickup_production [path/to/file.csv]"
+  exit 1
+fi
+
+echo "🚀 ClickUp Production Import"
+echo "============================"
+echo ""
+echo "CSV file: $CSV_FILE"
+echo "Target: Production (fizzy.teamblueotter.com)"
+echo ""
+
+# Check if Kamal is available
+if ! command -v kamal &> /dev/null; then
+  echo "Error: kamal command not found"
+  echo "Install Kamal: gem install kamal"
+  exit 1
+fi
+
+# Confirm before proceeding
+read -p "⚠️  This will import data to PRODUCTION. Continue? (yes/no): " confirm
+if [ "$confirm" != "yes" ]; then
+  echo "Aborted."
+  exit 0
+fi
+
+echo ""
+echo "📤 Step 1: Uploading CSV to production server..."
+kamal app exec "cat > $REMOTE_PATH" < "$CSV_FILE"
+
+if [ $? -ne 0 ]; then
+  echo "❌ Failed to upload CSV"
+  exit 1
+fi
+
+echo "✅ CSV uploaded to: $REMOTE_PATH"
+echo ""
+
+echo "📊 Step 2: Running import..."
+echo ""
+
+# Run the import and capture output
+kamal app exec "cd /rails && bin/rails runner \"
+  importer = Import::ClickupCsvImporter.new(csv_path: '$REMOTE_PATH')
+  result = importer.import_all
+  puts 'Import completed!'
+  puts '  Imported: ' + result[:imported].to_s
+  puts '  Skipped: ' + result[:skipped].to_s
+  puts '  Errors: ' + result[:errors].to_s
+\""
+
+IMPORT_EXIT_CODE=$?
+
+echo ""
+
+# Clean up remote file
+echo "🧹 Step 3: Cleaning up..."
+kamal app exec "rm -f $REMOTE_PATH" 2>/dev/null || true
+
+if [ $IMPORT_EXIT_CODE -eq 0 ]; then
+  echo ""
+  echo "✅ Import completed successfully!"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Check the production site: https://fizzy.teamblueotter.com"
+  echo "  2. Verify boards and cards were created correctly"
+  echo "  3. Check for any errors in the output above"
+else
+  echo ""
+  echo "❌ Import failed with exit code: $IMPORT_EXIT_CODE"
+  echo "Check the error messages above for details"
+  exit $IMPORT_EXIT_CODE
+fi
