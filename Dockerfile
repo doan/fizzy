@@ -67,8 +67,8 @@ LABEL org.opencontainers.image.source="${OCI_SOURCE}"
 LABEL org.opencontainers.image.licenses="O'Saasy"
 
 # --- ADD THIS BLOCK ---
-HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=5 \
-  CMD curl -f http://localhost:3000/up || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --start-period=90s --retries=10 \
+  CMD curl -fsS http://127.0.0.1:3000/up || exit 1
 # --- END BLOCK ---
 
 # Run and own only the runtime files as a non-root user for security

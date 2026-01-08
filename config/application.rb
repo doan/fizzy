@@ -6,6 +6,7 @@ Bundler.require(*Rails.groups)
 
 module Fizzy
   class Application < Rails::Application
+  config.eager_load_paths << Rails.root.join("lib")
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 

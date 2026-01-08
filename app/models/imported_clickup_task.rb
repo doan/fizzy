@@ -1,0 +1,2 @@
+class ImportedClickupTask < ApplicationRecord
+end

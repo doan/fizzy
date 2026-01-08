@@ -9,7 +9,8 @@ gem "importmap-rails"
 gem "propshaft"
 gem "stimulus-rails"
 gem "turbo-rails"
-
+gem "csv"
+ 
 # Deployment and drivers
 gem "bootsnap", require: false
 gem "kamal", require: false
