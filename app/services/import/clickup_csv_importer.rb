@@ -34,7 +34,7 @@ module Import
       skipped_count = 0
       error_count = 0
 
-      CSV.foreach(csv_path, headers: true, encoding: "UTF-8") do |row|
+      CSV.foreach(csv_path, headers: true, encoding: "UTF-8", liberal_parsing: true) do |row|
         begin
           if import_task(row)
             imported_count += 1
