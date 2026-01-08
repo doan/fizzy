@@ -36,8 +36,8 @@ echo ""
 echo "📊 Running import..."
 echo ""
 
-# Run the import
-bin/rails runner "
+# Run the import using bundle exec to ensure correct Ruby/gems
+bundle exec bin/rails runner "
   importer = Import::ClickupCsvImporter.new(csv_path: '$CSV_FILE')
   result = importer.import_all
   puts 'Import completed!'
