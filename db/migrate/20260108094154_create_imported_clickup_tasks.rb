@@ -1,6 +1,7 @@
 class CreateImportedClickupTasks < ActiveRecord::Migration[8.2]
   def change
     create_table :imported_clickup_tasks, id: :uuid do |t|
+      t.uuid :account_id, null: false
       t.string :external_id
       t.string :folder_name
       t.string :list_name
@@ -13,6 +14,9 @@ class CreateImportedClickupTasks < ActiveRecord::Migration[8.2]
       t.json :raw_payload
 
       t.timestamps
+
+      t.index :account_id
+      t.index :external_id
     end
   end
 end
