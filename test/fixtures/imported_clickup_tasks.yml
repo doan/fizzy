@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  external_id: MyString
+  folder_name: MyString
+  list_name: MyString
+  title: MyString
+  description: MyText
+  status: MyString
+  priority: MyString
+  assignees: MyText
+  sprint_label: MyString
+  raw_payload: 
+
+two:
+  external_id: MyString
+  folder_name: MyString
+  list_name: MyString
+  title: MyString
+  description: MyText
+  status: MyString
+  priority: MyString
+  assignees: MyText
+  sprint_label: MyString
+  raw_payload: 
