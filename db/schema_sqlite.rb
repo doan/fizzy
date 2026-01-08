@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2025_12_19_120755) do
+ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
   create_table "accesses", id: :uuid, force: :cascade do |t|
     t.datetime "accessed_at"
     t.uuid "account_id", null: false
@@ -169,6 +169,16 @@ ActiveRecord::Schema[8.2].define(version: 2025_12_19_120755) do
     t.index ["card_id"], name: "index_card_activity_spikes_on_card_id", unique: true
   end
 
+  create_table "card_engagements", id: :uuid, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "card_id"
+    t.datetime "created_at", null: false
+    t.string "status", limit: 255, default: "doing", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_card_engagements_on_account_id_and_status"
+    t.index ["card_id"], name: "index_card_engagements_on_card_id"
+  end
+
   create_table "card_goldnesses", id: :uuid, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "card_id", null: false
@@ -321,6 +331,21 @@ ActiveRecord::Schema[8.2].define(version: 2025_12_19_120755) do
     t.index ["identity_id"], name: "index_access_token_on_identity_id"
   end
 
+  create_table "imported_clickup_tasks", id: :uuid, force: :cascade do |t|
+    t.text "assignees", limit: 65535
+    t.datetime "created_at", null: false
+    t.text "description", limit: 65535
+    t.string "external_id", limit: 255
+    t.string "folder_name", limit: 255
+    t.string "list_name", limit: 255
+    t.string "priority", limit: 255
+    t.json "raw_payload"
+    t.string "sprint_label", limit: 255
+    t.string "status", limit: 255
+    t.string "title", limit: 255
+    t.datetime "updated_at", null: false
+  end
+
   create_table "magic_links", id: :uuid, force: :cascade do |t|
     t.string "code", limit: 255, null: false
     t.datetime "created_at", null: false
@@ -469,7 +494,7 @@ ActiveRecord::Schema[8.2].define(version: 2025_12_19_120755) do
     t.string "operation", limit: 255, null: false
     t.uuid "recordable_id"
     t.string "recordable_type", limit: 255
-    t.string "request_id"
+    t.string "request_id", limit: 255
     t.uuid "user_id"
     t.index ["account_id"], name: "index_storage_entries_on_account_id"
     t.index ["blob_id"], name: "index_storage_entries_on_blob_id"
