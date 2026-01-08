@@ -2,9 +2,16 @@
 
 ## Overview
 
-This implementation allows you to import data from ClickUp into Fizzy. The import maps:
-- **ClickUp Folders** → **Fizzy Boards**
+This implementation allows you to import data from ClickUp into Fizzy. The import follows a specific mapping structure:
+
+### Mapping Structure
+
+- **ClickUp Folders** → **Fizzy Boards** (long-lived areas of work)
+- **ClickUp Lists** → **Fizzy Labels (tags)** (contextual, not structural)
 - **ClickUp Tasks** → **Fizzy Cards**
+- **ClickUp Status** → **Fizzy Columns/Status** (Open, In Progress, In Review, Blocked, Done)
+- **Bug/Feature tags** → **Title prefix** `[bug]` or `[feature]`
+- **Priority** → **Label** (priority: urgent, priority: high, etc.)
 - Tracks imported tasks in `ImportedClickupTask` model
 
 ## What Was Implemented
@@ -31,7 +38,36 @@ This implementation allows you to import data from ClickUp into Fizzy. The impor
 
 ## Usage
 
-### Prerequisites
+### CSV Import (Recommended)
+
+The CSV importer matches the agreed specification and is the recommended approach.
+
+**Prerequisites:**
+1. Export your ClickUp data as CSV from ClickUp
+2. Ensure the CSV has the required columns (Task ID, Task Name, Folder Name/Path, List Name, Status, etc.)
+
+**Running the CSV Import:**
+
+**Option 1: Command line argument**
+```bash
+rake clickup:import_csv[path/to/clickup_export.csv]
+```
+
+**Option 2: Environment variable**
+```bash
+CLICKUP_CSV_PATH=path/to/clickup_export.csv rake clickup:import_csv
+```
+
+**Option 3: In Rails console**
+```ruby
+importer = Import::ClickupCsvImporter.new(csv_path: "path/to/clickup_export.csv")
+result = importer.import_all
+# Returns: { imported: count, skipped: count, errors: count }
+```
+
+### API Import (Alternative)
+
+If you prefer to import directly from the ClickUp API:
 
 1. **Get ClickUp API Token**
    - Go to ClickUp Settings → Apps → API
@@ -41,38 +77,33 @@ This implementation allows you to import data from ClickUp into Fizzy. The impor
 2. **Get ClickUp Space ID**
    - In ClickUp, go to your Space
    - The Space ID is in the URL: `https://app.clickup.com/{space_id}/...`
-   - Or use the API to list spaces
 
-### Running the Import
-
-**Option 1: Command line arguments**
+**Running the API Import:**
 ```bash
-rake clickup:import[your_api_token,your_space_id]
+rake clickup:import_api[your_api_token,your_space_id]
+# or
+CLICKUP_API_TOKEN=your_token CLICKUP_SPACE_ID=your_space_id rake clickup:import_api
 ```
 
-**Option 2: Environment variables**
-```bash
-CLICKUP_API_TOKEN=your_token CLICKUP_SPACE_ID=your_space_id rake clickup:import
-```
-
-**Option 3: In Rails console**
-```ruby
-importer = Import::ClickupImporter.new(
-  api_token: "your_token",
-  space_id: "your_space_id"
-)
-importer.import_all
-```
-
-### What Gets Imported
+### What Gets Imported (CSV Import)
 
 - **Folders** → Each ClickUp folder becomes a Fizzy board
+- **Lists** → List names become labels (tags) on cards
 - **Tasks** → Each ClickUp task becomes a Fizzy card with:
-  - Title from task name
-  - Description from task description
-  - Status information stored in metadata
-  - Priority information stored in metadata
-  - Assignees information stored in metadata
+  - Title from task name (with [bug] or [feature] prefix if applicable)
+  - Description from task content
+  - Status mapped to Fizzy columns:
+    - `backlog` / `to do` → Open (awaiting triage)
+    - `in progress` → In Progress column
+    - `review` → In Review column
+    - `blocked` → Blocked column
+    - `done` / `complete` → Done column (card is closed)
+  - List name as a label (tag)
+  - Priority as a label (priority: urgent, priority: high, etc.)
+  - Tags from ClickUp (except bug/feature which become title prefixes)
+  - Assignees (matched by email or name)
+  - Due dates (stored in `due_on` field)
+  - Created dates (preserved from ClickUp)
 
 ### Import Tracking
 
@@ -117,9 +148,10 @@ Potential improvements:
 ## Files Created/Modified
 
 - `app/models/imported_clickup_task.rb` - Model for tracking imports
-- `app/services/import/clickup_importer.rb` - Main import service
+- `app/services/import/clickup_csv_importer.rb` - CSV-based import service (recommended)
+- `app/services/import/clickup_importer.rb` - API-based import service
 - `app/services/import/context.rb` - Account context helper
-- `lib/tasks/clickup_import.rake` - Rake task for running imports
+- `lib/tasks/clickup_import.rake` - Rake tasks for running imports
 - `db/migrate/20260108094154_create_imported_clickup_tasks.rb` - Initial migration
 - `db/migrate/20260108120000_add_card_to_imported_clickup_tasks.rb` - Card reference migration
 
