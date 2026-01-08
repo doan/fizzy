@@ -48,17 +48,26 @@ The CSV importer matches the agreed specification and is the recommended approac
 
 **Running the CSV Import:**
 
-**Option 1: Command line argument**
+**Option 1: Helper scripts (Recommended)**
+```bash
+# Import to local development database
+bin/import_clickup_local [path/to/file.csv]
+
+# Import to production server
+bin/import_clickup_production [path/to/file.csv]
+```
+
+**Option 2: Rake task (local only)**
 ```bash
 rake clickup:import_csv[path/to/clickup_export.csv]
 ```
 
-**Option 2: Environment variable**
+**Option 3: Environment variable**
 ```bash
 CLICKUP_CSV_PATH=path/to/clickup_export.csv rake clickup:import_csv
 ```
 
-**Option 3: In Rails console**
+**Option 4: In Rails console**
 ```ruby
 importer = Import::ClickupCsvImporter.new(csv_path: "path/to/clickup_export.csv")
 result = importer.import_all
