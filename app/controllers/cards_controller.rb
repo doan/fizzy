@@ -39,10 +39,25 @@ class CardsController < ApplicationController
   end
 
   def destroy
+    # Capture location and DOM IDs before destroying
+    @board = @card.board
+    @source_column = @card.column
+    @was_in_stream = @card.awaiting_triage?
+    @was_postponed = @card.postponed?
+    @was_closed = @card.closed?
+    @card_article_id = dom_id(@card, :article)
+    @card_container_id = dom_id(@card, :card_container)
+    
     @card.destroy!
+    
+    # Set up page for stream if needed
+    if @was_in_stream
+      set_page_and_extract_portion_from @board.cards.awaiting_triage.latest.with_golden_first.preloaded
+    end
 
     respond_to do |format|
-      format.html { redirect_to @card.board, notice: "Card deleted" }
+      format.turbo_stream
+      format.html { redirect_to @board, notice: "Card deleted" }
       format.json { head :no_content }
     end
   end

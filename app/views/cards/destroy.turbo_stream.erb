@@ -1,0 +1,12 @@
+<%= turbo_stream.remove @card_article_id %>
+<%= turbo_stream.remove @card_container_id %>
+
+<% if @source_column %>
+  <%= turbo_stream.replace(dom_id(@source_column), partial: "boards/show/column", method: :morph, locals: { column: @source_column }) %>
+<% elsif @was_in_stream %>
+  <%= turbo_stream.replace("the-stream", partial: "boards/show/stream", method: :morph, locals: { board: @board, page: @page }) %>
+<% elsif @was_postponed %>
+  <%= turbo_stream.replace("not-now", partial: "boards/show/not_now", method: :morph, locals: { board: @board }) %>
+<% elsif @was_closed %>
+  <%= turbo_stream.replace("closed-cards", partial: "boards/show/closed", method: :morph, locals: { board: @board }) %>
+<% end %>
