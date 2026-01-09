@@ -42,7 +42,7 @@ namespace :clickup do
     fireflies_cards = Card
       .joins(:board)
       .where(boards: { account: account })
-      .joins("LEFT JOIN action_text_rich_texts ON action_text_rich_texts.record_type = 'Card' AND action_text_rich_texts.record_id = cards.id AND action_text_rich_texts.name = 'description'")
+      .joins("INNER JOIN action_text_rich_texts ON action_text_rich_texts.record_type = 'Card' AND action_text_rich_texts.record_id = cards.id AND action_text_rich_texts.name = 'description'")
       .where("action_text_rich_texts.body LIKE ?", "%fireflies.ai%")
     
     puts "Found #{fireflies_cards.count} cards with fireflies.ai in description"
