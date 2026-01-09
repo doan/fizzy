@@ -11,22 +11,26 @@ module ClickupImportCreatorFixer
     if raw_payload.is_a?(Hash)
       # Check if it's an API import (has "id" key and creator/created_by)
       if raw_payload.key?("id") && (raw_payload.key?("creator") || raw_payload.key?("created_by"))
-        extract_creator_from_api_payload(raw_payload, account, system_user)
+        creator = extract_creator_from_api_payload(raw_payload, account, system_user)
+        return creator if creator != system_user
       # Otherwise assume it's a CSV import (has "Task ID" or assignees)
       elsif raw_payload.key?("Task ID") || raw_payload.key?(" Task ID") || raw_payload.key?("Assignees") || raw_payload.key?(" Assignees")
-        extract_creator_from_csv_payload(raw_payload, account, system_user)
-      # Try assignees field as fallback
-      elsif imported_task.assignees.present?
-        extract_creator_from_assignees(imported_task.assignees, account, system_user)
-      else
-        system_user
+        creator = extract_creator_from_csv_payload(raw_payload, account, system_user)
+        # If raw_payload assignees are empty, try the assignees field as fallback
+        if creator == system_user && imported_task.assignees.present? && imported_task.assignees != "[]"
+          creator = extract_creator_from_assignees(imported_task.assignees, account, system_user)
+        end
+        return creator
       end
-    elsif imported_task.assignees.present?
-      # If raw_payload is not useful, try assignees field
-      extract_creator_from_assignees(imported_task.assignees, account, system_user)
-    else
-      system_user
     end
+    
+    # Fallback: try assignees field directly
+    if imported_task.assignees.present? && imported_task.assignees != "[]"
+      creator = extract_creator_from_assignees(imported_task.assignees, account, system_user)
+      return creator if creator != system_user
+    end
+    
+    system_user
   end
   
   def extract_creator_from_api_payload(task_data, account, system_user)
@@ -75,13 +79,22 @@ module ClickupImportCreatorFixer
   end
   
   def extract_creator_from_assignees(assignees_text, account, system_user)
-    return system_user if assignees_text.blank?
+    return system_user if assignees_text.blank? || assignees_text == "[]"
     
-    # Try to parse as comma-separated list
-    assignee_list = assignees_text.split(",").map(&:strip)
-    if assignee_list.any?
-      creator = find_user_by_name_or_email(assignee_list.first, account)
-      return creator if creator
+    # Try to parse as JSON array first (common format from CSV imports)
+    begin
+      assignee_list = JSON.parse(assignees_text)
+      if assignee_list.is_a?(Array) && assignee_list.any?
+        creator = find_user_by_name_or_email(assignee_list.first, account)
+        return creator if creator
+      end
+    rescue JSON::ParserError
+      # Not JSON, try as comma-separated list
+      assignee_list = assignees_text.split(",").map(&:strip)
+      if assignee_list.any?
+        creator = find_user_by_name_or_email(assignee_list.first, account)
+        return creator if creator
+      end
     end
     
     system_user
