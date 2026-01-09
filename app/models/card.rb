@@ -14,6 +14,7 @@ class Card < ApplicationRecord
 
   before_save :set_default_title, if: :published?
   before_create :assign_number
+  before_destroy :nullify_imported_clickup_tasks
 
   after_save   -> { board.touch }, if: :published?
   after_touch  -> { board.touch }, if: :published?
@@ -147,5 +148,9 @@ class Card < ApplicationRecord
 
     def assign_number
       self.number ||= account.increment!(:cards_count).cards_count
+    end
+
+    def nullify_imported_clickup_tasks
+      ImportedClickupTask.where(card_id: id).update_all(card_id: nil)
     end
 end
