@@ -24,12 +24,29 @@ namespace :clickup do
       if imported_task.card
         board = imported_task.card.board
         card_number = imported_task.card.number
+        card = imported_task.card
         
         begin
-          imported_task.card.destroy!
-          deleted_cards += 1
-          deleted_boards << board.id
-          puts "  ✓ Deleted card ##{card_number} from board '#{board.name}'"
+          # Delete associated records first to avoid foreign key constraints
+          # The card model has dependent: :destroy on most associations, but we'll be explicit
+          card.comments.destroy_all
+          card.assignments.destroy_all
+          card.events.destroy_all
+          card.taggings.destroy_all
+          card.steps.destroy_all
+          card.pins.destroy_all
+          card.watches.destroy_all
+          
+          # Delete the card itself
+          card.destroy
+          
+          if card.destroyed?
+            deleted_cards += 1
+            deleted_boards << board.id
+            puts "  ✓ Deleted card ##{card_number} from board '#{board.name}'"
+          else
+            puts "  ✗ Failed to delete card ##{card_number}: #{card.errors.full_messages.join(', ')}"
+          end
         rescue => e
           puts "  ✗ Error deleting card ##{card_number}: #{e.message}"
         end
