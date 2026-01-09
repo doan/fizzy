@@ -1,16 +1,25 @@
 <div id="<%= dom_id(card, :assignees) %>" class="position-relative"
     data-controller="dialog"
     data-action="keydown.esc->dialog#close click@document->dialog#closeOnClickOutside mouseenter->dialog#loadLazyFrames" <%= "hidden" if card.closed? %>>
-  <button class="card__assignees-trigger" data-action="click->dialog#open:stop keydown.a@document->hotkey#click" data-controller="tooltip hotkey" tabindex=<%= (local_assigns.key?(:preview) && local_assigns[:preview]) ? -1 : 0 %>>
-    <% card.assignees.each do |assignee| %>
-      <%= avatar_preview_tag assignee, tabindex: (local_assigns.key?(:preview) && local_assigns[:preview]) ? -1 : 0 %>
-    <% end %>
+  <div class="flex gap-half align-center">
+    <button class="card__assignees-trigger" data-action="click->dialog#open:stop keydown.a@document->hotkey#click" data-controller="tooltip hotkey" tabindex=<%= (local_assigns.key?(:preview) && local_assigns[:preview]) ? -1 : 0 %>>
+      <% card.assignees.each do |assignee| %>
+        <%= avatar_preview_tag assignee, tabindex: (local_assigns.key?(:preview) && local_assigns[:preview]) ? -1 : 0 %>
+      <% end %>
 
-    <span class="btn card__hide-on-index" style="--btn-background: var(--card-bg-color);">
-      <%= icon_tag "person-add" %>
-      <span class="for-screen-reader">Assign</span>
-    </span>
-  </button>
+      <span class="btn card__hide-on-index" style="--btn-background: var(--card-bg-color);">
+        <%= icon_tag "person-add" %>
+        <span class="for-screen-reader">Assign</span>
+      </span>
+    </button>
+
+    <% if Current.user && !local_assigns[:preview] && card.published? && !card.closed? %>
+      <button type="button" class="btn card__hide-on-index" style="--btn-background: var(--card-bg-color);" data-controller="tooltip time-entry" data-action="click->time-entry#showPrompt" data-time-entry-url-value="<%= new_card_time_entry_path(card) %>">
+        <%= icon_tag "clock" %>
+        <span class="for-screen-reader">Log Time</span>
+      </button>
+    <% end %>
+  </div>
 
   <% if Current.user && !local_assigns[:preview] %>
     <%= button_to "Assign to me", card_assignments_path(card, params: { assignee_id: Current.user.id }), method: :post, data: {controller: "hotkey", action: "keydown.m@document->hotkey#click" }, hidden: true %>

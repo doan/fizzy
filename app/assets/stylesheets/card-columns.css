@@ -460,9 +460,20 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 
+    /* Default: expanded state - show hours */
+    align-items: center;
+    display: flex;
+    gap: 0.25ch;
+    max-inline-size: calc(100% - var(--column-width-collapsed) * 2);
+
     .cards.is-collapsed & {
+      display: block;
       max-inline-size: 50vh;
       writing-mode: vertical-rl;
+
+      .cards__expander-hours {
+        display: none;
+      }
     }
 
     .cards.is-expanded & {

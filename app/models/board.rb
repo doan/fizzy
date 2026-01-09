@@ -12,4 +12,22 @@ class Board < ApplicationRecord
 
   scope :alphabetically, -> { order("lower(name)") }
   scope :ordered_by_recently_accessed, -> { merge(Access.ordered_by_recently_accessed) }
+
+  def total_tracked_hours_for_awaiting_triage
+    card_ids = cards.awaiting_triage.pluck(:id)
+    return 0.0 if card_ids.empty?
+    TimeEntry.where(card_id: card_ids).sum(:hours) || 0.0
+  end
+
+  def total_tracked_hours_for_postponed
+    card_ids = cards.postponed.pluck(:id)
+    return 0.0 if card_ids.empty?
+    TimeEntry.where(card_id: card_ids).sum(:hours) || 0.0
+  end
+
+  def total_tracked_hours_for_closed
+    card_ids = cards.closed.pluck(:id)
+    return 0.0 if card_ids.empty?
+    TimeEntry.where(card_id: card_ids).sum(:hours) || 0.0
+  end
 end

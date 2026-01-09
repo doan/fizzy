@@ -16,6 +16,13 @@
     <%= local_datetime_tag(card.last_active_at, style: :daysago) %>
   </span>
 
+  <% if card.total_time_hours > 0 %>
+    <span class="card__meta-text card__meta-text--time-logged overflow-ellipsis">
+      <%= icon_tag "clock" %>
+      <strong><%= "%.2f" % card.total_time_hours %>h</strong>
+    </span>
+  <% end %>
+
   <span class="card__meta-text card__meta-text--assignees overflow-ellipsis">
     <%= icon_tag("arrow-right", aria: { label: "Assigned to" }) if card.assignees.any? %>
     <%= card.assignees.map { |assignee| h assignee.familiar_name }.to_sentence(two_words_connector: " / ", last_word_connector: " / ").html_safe %>

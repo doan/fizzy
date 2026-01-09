@@ -1,0 +1,20 @@
+<%= turbo_stream.replace([ @card, :card_container ], partial: "cards/container", method: :morph, locals: { card: @card.reload }) %>
+
+<%= turbo_stream.update dom_id(@card, :time_entry_container), "" %>
+
+<% if @comment %>
+  <%= turbo_stream.before [ @card, :new_comment ], partial: "cards/comments/comment", locals: { comment: @comment } %>
+  <%= turbo_stream.update [ @card, :new_comment ], partial: "cards/comments/new", locals: { card: @card } %>
+<% end %>
+
+<% reloaded_card = @card.reload %>
+<% if reloaded_card.time_entries.any? %>
+  <%= turbo_stream.update dom_id(@card, :time_entry_history) do %>
+    <div class="card__time-entry-history" style="margin-block-start: 0.5rem; padding-block-start: 0.75rem; border-top: 1px solid var(--border-color);">
+      <h3 class="txt-small txt-bold margin-block-end-half" style="text-transform: uppercase;">[Time Tracked]</h3>
+      <%= render "cards/time_entries/history", card: reloaded_card %>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.update dom_id(@card, :time_entry_history), "" %>
+<% end %>

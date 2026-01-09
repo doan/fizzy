@@ -220,9 +220,9 @@
     font-size: var(--text-x-small);
     font-weight: 500;
     grid-template-areas:
-      "avatars-author text-added text-updated avatars-assignees"
-      "avatars-author text-author text-assignees avatars-assignees";
-    grid-template-columns: auto auto 1fr auto;
+      "avatars-author text-added text-updated text-time-logged avatars-assignees"
+      "avatars-author text-author text-assignees . avatars-assignees";
+    grid-template-columns: auto auto auto auto 1fr auto;
     inline-size: fit-content;
     text-transform: uppercase;
 
@@ -238,6 +238,7 @@
   .card__meta-text--added { grid-area: text-added; }
   .card__meta-text--author { grid-area: text-author; }
   .card__meta-text--updated { grid-area: text-updated; }
+  .card__meta-text--time-logged { grid-area: text-time-logged; }
   .card__meta-text--assignees { grid-area: text-assignees; }
 
   .card__meta-avatars {

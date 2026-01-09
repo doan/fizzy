@@ -1,0 +1,3 @@
+<%= turbo_stream.update dom_id(@card, :time_entry_container) do %>
+  <%= render "cards/time_entries/form_inline", card: @card %>
+<% end %>

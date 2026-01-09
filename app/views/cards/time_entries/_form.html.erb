@@ -1,0 +1,22 @@
+<div class="card__time-entry">
+  <h4 class="txt-small txt-bold margin-block-half">Log Time</h4>
+  <%= form_with model: [ card, TimeEntry.new ], url: card_time_entries_path(card), class: "flex flex-column gap-half", data: { turbo_frame: "_top" } do |form| %>
+    <div class="flex gap-half align-end">
+      <div class="flex-item-grow">
+        <%= form.label :hours, "Hours", class: "for-screen-reader" %>
+        <%= form.number_field :hours, step: 0.25, min: 0, placeholder: "0.0", class: "input", required: true %>
+      </div>
+      <%= form.submit "Add", class: "btn" %>
+    </div>
+    <div>
+      <%= form.label :notes, "Notes (optional)", class: "for-screen-reader" %>
+      <%= form.text_area :notes, rows: 2, class: "input", placeholder: "What did you work on?" %>
+    </div>
+  <% end %>
+  
+  <% if card.total_time_hours > 0 %>
+    <div class="txt-small txt-medium margin-block-start">
+      <strong>Total time:</strong> <%= pluralize(card.total_time_hours, "hour") %>
+    </div>
+  <% end %>
+</div>

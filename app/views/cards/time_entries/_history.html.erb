@@ -1,0 +1,11 @@
+<% if card.time_entries.any? %>
+  <% card.time_entries.recent.limit(10).each do |time_entry| %>
+    <div class="txt-small txt-medium margin-block-quarter">
+      <strong><%= time_entry.user.familiar_name %></strong> tracked <strong><%= "%.2f" % time_entry.hours %>h</strong>
+      <% if time_entry.notes.present? %>
+        <span class="translucent">· <%= time_entry.notes %></span>
+      <% end %>
+      <span class="translucent">· <%= local_datetime_tag(time_entry.created_at, style: :daysago) %></span>
+    </div>
+  <% end %>
+<% end %>

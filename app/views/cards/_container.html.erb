@@ -27,6 +27,17 @@
           <%= render "cards/display/perma/meta", card: card %>
           <%= render "cards/display/perma/background", card: card %>
         </footer>
+        
+        <% if card.time_entries.any? %>
+          <div id="<%= dom_id(card, :time_entry_history) %>" class="card__time-entry-history" style="margin-block-start: 0.5rem; padding-block-start: 0.75rem; border-top: 1px solid var(--border-color);">
+            <h3 class="txt-small txt-bold margin-block-end-half" style="text-transform: uppercase;">[Time Tracked]</h3>
+            <%= render "cards/time_entries/history", card: card %>
+          </div>
+        <% else %>
+          <div id="<%= dom_id(card, :time_entry_history) %>"></div>
+        <% end %>
+        
+        <div id="<%= dom_id(card, :time_entry_container) %>"></div>
       <% end %>
 
       <% if card.entropic? %>

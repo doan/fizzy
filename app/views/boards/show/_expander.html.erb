@@ -2,7 +2,10 @@
   style="--card-count: <%= [ count, 15 ].min %>" aria-controls="<%= column_id %>" aria-expanded="false">
   <span class="cards__expander-count" data-drag-and-drop-counter="true"><%= count > 99 ? "99+" : count %></span>
   <h2 class="cards__expander-title" data-collapsible-columns-target="title">
-    <%= title %>
+    <span class="cards__expander-name"><%= local_assigns[:base_title] || title %></span>
+    <% if local_assigns[:tracked_hours] && local_assigns[:tracked_hours] > 0 %>
+      <span class="cards__expander-hours"><%= "(#{format('%.2f', local_assigns[:tracked_hours])}h tracked)" %></span>
+    <% end %>
     <%= icon_tag "collapse" %>
   </h2>
 </button>

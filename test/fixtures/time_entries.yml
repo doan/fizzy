@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  card: one
+  user: one
+  account: one
+  hours: 9.99
+  notes: MyText
+
+two:
+  card: two
+  user: two
+  account: two
+  hours: 9.99
+  notes: MyText

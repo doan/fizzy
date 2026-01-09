@@ -6,7 +6,7 @@
     action: "focus->collapsible-columns#focusOnColumn"
   } do %>
   <header class="cards__header">
-    <%= render "boards/show/expander", title: "Done", count: board.cards.closed.count, column_id: "closed-cards" %>
+    <%= render "boards/show/expander", base_title: "Done", tracked_hours: board.total_tracked_hours_for_closed, count: board.cards.closed.count, column_id: "closed-cards" %>
     <%= render "boards/show/menu/maximize", column_path: board_columns_closed_path(board) %>
   </header>
   <%= column_frame_tag :closed_column, src: board_columns_closed_path(board) %>

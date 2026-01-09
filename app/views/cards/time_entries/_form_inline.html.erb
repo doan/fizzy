@@ -1,0 +1,15 @@
+<div id="<%= dom_id(card, :time_entry_form) %>" class="card__time-entry-inline" style="margin-block-start: 1.5rem; padding-block-start: 1rem; border-top: 1px solid var(--border-color);">
+  <%= form_with model: [ card, TimeEntry.new ], url: card_time_entries_path(card), class: "flex flex-column gap-half", data: { controller: "form" } do |form| %>
+    <div class="flex gap-half align-end">
+      <div class="flex-item-grow">
+        <%= form.label :hours, "Hours", class: "txt-small txt-bold" %>
+        <%= form.number_field :hours, step: 0.25, min: 0, placeholder: "0.0", class: "input", required: true, autofocus: true, data: { form_target: "input" } %>
+      </div>
+      <%= form.submit "Log", class: "btn" %>
+    </div>
+    <div>
+      <%= form.label :notes, "Notes (optional)", class: "txt-small txt-bold" %>
+      <%= form.text_area :notes, rows: 2, class: "input", placeholder: "What did you work on?", data: { form_target: "input" } %>
+    </div>
+  <% end %>
+</div>

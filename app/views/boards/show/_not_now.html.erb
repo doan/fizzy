@@ -6,7 +6,7 @@
     action: "focus->collapsible-columns#focusOnColumn"
   } do %>
   <header class="cards__header">
-    <%= render "boards/show/expander", title: "Not Now", count: board.cards.postponed.count, column_id: "not-now" %>
+    <%= render "boards/show/expander", base_title: "Not Now", tracked_hours: board.total_tracked_hours_for_postponed, count: board.cards.postponed.count, column_id: "not-now" %>
     <%= render "boards/show/menu/maximize", column_path: board_columns_not_now_path(board) %>
   </header>
   <%= column_frame_tag :not_now_column, src: board_columns_not_now_path(board) %>

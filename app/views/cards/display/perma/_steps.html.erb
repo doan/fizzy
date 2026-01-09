@@ -1,4 +1,4 @@
-<ol class="steps txt-small margin-block-start-auto">
+<ol id="<%= dom_id(card, :steps) %>" class="steps txt-small margin-block-start-auto">
   <%= render partial: "cards/steps/step", collection: card.steps, as: :step %>
 
   <% unless card.closed? %>
