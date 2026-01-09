@@ -223,15 +223,19 @@ module Import
         prefix = extract_bug_feature_prefix(tags_json)
         title = prefix ? "[#{prefix}] #{task_name}" : task_name
 
+        # Try to find the creator from assignees (best guess for CSV imports)
+        # CSV doesn't have creator info, so we use the first assignee as a proxy
+        creator = extract_creator_from_row(row)
+
         # Set Current.user for event tracking
         old_current_user = Current.user
-        Current.user = system_user
+        Current.user = creator
 
         # Create card
         card = board.cards.build(
           account: account,
           board: board,
-          creator: system_user,
+          creator: creator,
           title: title,
           status: "published"
         )
@@ -274,7 +278,7 @@ module Import
 
         # If status is "done" or "complete", close the card
         if ["done", "complete"].include?(status.downcase)
-          card.close(user: system_user)
+          card.close(user: creator)
         end
 
         # Add list name as label (tag)
@@ -371,6 +375,28 @@ module Import
 
         # Try to find by name (partial match)
         account.users.find_by("LOWER(name) LIKE ?", "%#{identifier.downcase}%")
+      end
+
+      def extract_creator_from_row(row)
+        # CSV exports don't have creator info directly
+        # Best guess: use the first assignee as the creator
+        assignees_json = row["Assignees"] || row[" Assignees"]
+        if assignees_json.present? && assignees_json != "[]" && assignees_json != "null"
+          begin
+            assignee_list = JSON.parse(assignees_json)
+            if assignee_list.is_a?(Array) && assignee_list.any?
+              creator = find_user_by_name_or_email(assignee_list.first)
+              return creator if creator
+            end
+          rescue JSON::ParserError
+            # Not JSON, try as single string
+            creator = find_user_by_name_or_email(assignees_json)
+            return creator if creator
+          end
+        end
+
+        # Fallback to system user if we can't find a creator
+        system_user
       end
   end
 end

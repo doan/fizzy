@@ -144,10 +144,17 @@ module Import
         # We could add a card_id reference to ImportedClickupTask later
         # For now, create new card
 
+        # Extract creator from ClickUp API response
+        creator = extract_creator_from_task_data(task_data)
+
+        # Set Current.user for event tracking
+        old_current_user = Current.user
+        Current.user = creator
+
         card = board.cards.build(
           account: account,
           board: board,
-          creator: system_user,
+          creator: creator,
           title: imported_task.title,
           status: "published"
         )
@@ -155,6 +162,16 @@ module Import
         # Set description if present
         if imported_task.description.present?
           card.description = imported_task.description
+        end
+
+        # Set created_at from ClickUp if available
+        if task_data["date_created"]
+          begin
+            created_timestamp = task_data["date_created"].to_i / 1000 # Convert ms to seconds
+            card.created_at = Time.at(created_timestamp)
+          rescue => e
+            Rails.logger.warn "Could not parse created date: #{e.message}"
+          end
         end
 
         # Map ClickUp status to Fizzy column if possible
@@ -171,6 +188,9 @@ module Import
 
         Rails.logger.debug "Created card #{card.number} from ClickUp task #{imported_task.external_id}"
         card
+      ensure
+        # Restore Current.user
+        Current.user = old_current_user
       end
 
       def extract_description(task_data)
@@ -190,6 +210,32 @@ module Import
         # ClickUp custom fields might contain sprint info
         # This is a placeholder - adjust based on your ClickUp setup
         task_data.dig("custom_fields")&.find { |f| f["name"]&.downcase&.include?("sprint") }&.dig("value")&.to_s
+      end
+
+      def extract_creator_from_task_data(task_data)
+        # ClickUp API provides creator info in the task data
+        creator_data = task_data["creator"] || task_data["created_by"]
+        return system_user unless creator_data
+
+        # Try to find user by email (most reliable)
+        email = creator_data["email"] || creator_data.dig("user", "email")
+        if email.present?
+          identity = Identity.find_by(email_address: email)
+          if identity
+            user = account.users.find_by(identity: identity)
+            return user if user
+          end
+        end
+
+        # Try to find by username
+        username = creator_data["username"] || creator_data.dig("user", "username")
+        if username.present?
+          user = account.users.find_by("LOWER(name) LIKE ?", "%#{username.downcase}%")
+          return user if user
+        end
+
+        # Fallback to system user if we can't find a match
+        system_user
       end
 
       def http_get(path)
