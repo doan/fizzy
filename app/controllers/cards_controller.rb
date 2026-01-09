@@ -41,7 +41,7 @@ class CardsController < ApplicationController
   def destroy
     # Capture location and DOM IDs before destroying
     @board = @card.board
-    @source_column = @card.column
+    source_column_id = @card.column_id
     @was_in_stream = @card.awaiting_triage?
     @was_postponed = @card.postponed?
     @was_closed = @card.closed?
@@ -49,6 +49,10 @@ class CardsController < ApplicationController
     @card_container_id = dom_id(@card, :card_container)
     
     @card.destroy!
+    
+    # Reload column from database after card is destroyed to get fresh associations
+    # This ensures the column's card associations are up to date when rendering the partial
+    @source_column = source_column_id ? @board.columns.find_by(id: source_column_id) : nil
     
     # Set up page for stream if needed
     if @was_in_stream
@@ -59,6 +63,15 @@ class CardsController < ApplicationController
       format.turbo_stream
       format.html { redirect_to @board, notice: "Card deleted" }
       format.json { head :no_content }
+    end
+  rescue => e
+    Rails.logger.error "Error destroying card #{@card&.number}: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    
+    respond_to do |format|
+      format.turbo_stream { head :unprocessable_entity }
+      format.html { redirect_to @board || root_path, alert: "Error deleting card" }
+      format.json { render json: { error: "Failed to delete card" }, status: :unprocessable_entity }
     end
   end
 
