@@ -40,23 +40,34 @@ class CardsController < ApplicationController
 
   def destroy
     # Capture location and DOM IDs before destroying
-    @board = @card.board
-    unless @board
-      Rails.logger.error "Card #{@card.number} has no board association"
+    begin
+      @board = @card.board
+      unless @board
+        Rails.logger.error "Card #{@card.number} has no board association"
+        respond_to do |format|
+          format.turbo_stream { render turbo_stream: "", status: :unprocessable_entity }
+          format.html { redirect_to root_path, alert: "Card has no board" }
+          format.json { render json: { error: "Card has no board" }, status: :unprocessable_entity }
+        end
+        return
+      end
+      
+      source_column_id = @card.column_id
+      @was_in_stream = @card.awaiting_triage?
+      @was_postponed = @card.postponed?
+      @was_closed = @card.closed?
+      @card_article_id = dom_id(@card, :article)
+      @card_container_id = dom_id(@card, :card_container)
+    rescue => e
+      Rails.logger.error "Error capturing card state before deletion: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
       respond_to do |format|
         format.turbo_stream { render turbo_stream: "", status: :unprocessable_entity }
-        format.html { redirect_to root_path, alert: "Card has no board" }
-        format.json { render json: { error: "Card has no board" }, status: :unprocessable_entity }
+        format.html { redirect_to root_path, alert: "Error preparing card deletion" }
+        format.json { render json: { error: "Error preparing card deletion" }, status: :unprocessable_entity }
       end
       return
     end
-    
-    source_column_id = @card.column_id
-    @was_in_stream = @card.awaiting_triage?
-    @was_postponed = @card.postponed?
-    @was_closed = @card.closed?
-    @card_article_id = dom_id(@card, :article)
-    @card_container_id = dom_id(@card, :card_container)
     
     begin
       @card.destroy!
