@@ -50,9 +50,17 @@ class CardsController < ApplicationController
     
     @card.destroy!
     
-    # Reload column from database after card is destroyed to get fresh associations
-    # This ensures the column's card associations are up to date when rendering the partial
-    @source_column = source_column_id ? @board.columns.find_by(id: source_column_id) : nil
+    # Reload board and column from database after card is destroyed to get fresh associations
+    # This ensures associations are up to date when rendering partials
+    @board.reload
+    
+    if source_column_id
+      # Find and reload the column to clear any cached associations
+      @source_column = @board.columns.find_by(id: source_column_id)
+      @source_column&.association(:cards).reset if @source_column
+    else
+      @source_column = nil
+    end
     
     # Set up page for stream if needed
     if @was_in_stream
