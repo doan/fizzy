@@ -161,7 +161,16 @@ class CardsController < ApplicationController
     end
 
     def ensure_permission_to_administer_card
-      head :forbidden unless Current.user.can_administer_card?(@card)
+      begin
+        unless Current.user.can_administer_card?(@card)
+          head :forbidden
+          return
+        end
+      rescue => e
+        Rails.logger.error "Error checking card administration permission: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        head :unprocessable_entity
+      end
     end
 
     def card_params
