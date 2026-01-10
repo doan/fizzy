@@ -106,7 +106,15 @@ class CardsController < ApplicationController
     end
 
     respond_to do |format|
-      format.turbo_stream
+      format.turbo_stream do
+        begin
+          render :destroy
+        rescue => e
+          Rails.logger.error "Error rendering turbo_stream for card deletion: #{e.message}"
+          Rails.logger.error e.backtrace.join("\n")
+          render turbo_stream: "", status: :unprocessable_entity
+        end
+      end
       format.html { redirect_to @board, notice: "Card deleted" }
       format.json { head :no_content }
     end
