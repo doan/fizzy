@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
+ActiveRecord::Schema[8.2].define(version: 2026_01_09_041518) do
   create_table "accesses", id: :uuid, force: :cascade do |t|
     t.datetime "accessed_at"
     t.uuid "account_id", null: false
@@ -332,7 +332,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
   end
 
   create_table "imported_clickup_tasks", id: :uuid, force: :cascade do |t|
+    t.uuid "account_id", null: false
     t.text "assignees", limit: 65535
+    t.uuid "card_id"
     t.datetime "created_at", null: false
     t.text "description", limit: 65535
     t.string "external_id", limit: 255
@@ -344,6 +346,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
     t.string "status", limit: 255
     t.string "title", limit: 255
     t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_imported_clickup_tasks_on_account_id"
+    t.index ["card_id"], name: "index_imported_clickup_tasks_on_card_id"
+    t.index ["external_id"], name: "index_imported_clickup_tasks_on_external_id"
   end
 
   create_table "magic_links", id: :uuid, force: :cascade do |t|
@@ -533,6 +538,20 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
     t.index ["account_id", "title"], name: "index_tags_on_account_id_and_title", unique: true
   end
 
+  create_table "time_entries", id: :uuid, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "card_id", null: false
+    t.datetime "created_at", null: false
+    t.decimal "hours", precision: 10, scale: 2, null: false
+    t.text "notes", limit: 65535
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["account_id"], name: "index_time_entries_on_account_id"
+    t.index ["card_id", "user_id"], name: "index_time_entries_on_card_id_and_user_id"
+    t.index ["card_id"], name: "index_time_entries_on_card_id"
+    t.index ["user_id"], name: "index_time_entries_on_user_id"
+  end
+
   create_table "user_settings", id: :uuid, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.integer "bundle_email_frequency", default: 0, null: false
@@ -610,6 +629,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_01_08_094154) do
     t.index ["account_id"], name: "index_webhooks_on_account_id"
     t.index ["board_id", "subscribed_actions"], name: "index_webhooks_on_board_id_and_subscribed_actions"
   end
+
+  add_foreign_key "time_entries", "accounts"
+  add_foreign_key "time_entries", "cards"
+  add_foreign_key "time_entries", "users"
   execute "CREATE VIRTUAL TABLE search_records_fts USING fts5(\n        title,\n        content,\n        tokenize='porter'\n      )"
 
 end

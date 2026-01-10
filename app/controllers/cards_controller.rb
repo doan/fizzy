@@ -55,7 +55,7 @@ class CardsController < ApplicationController
       Rails.logger.error e.backtrace.join("\n")
       
       respond_to do |format|
-        format.turbo_stream { head :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: "", status: :unprocessable_entity }
         format.html { redirect_to @board || root_path, alert: "Error deleting card: #{e.message}" }
         format.json { render json: { error: "Failed to delete card: #{e.message}" }, status: :unprocessable_entity }
       end
@@ -77,18 +77,37 @@ class CardsController < ApplicationController
       
       # Set up page for stream if needed
       if @was_in_stream
-        set_page_and_extract_portion_from @board.cards.awaiting_triage.latest.with_golden_first.preloaded
+        begin
+          set_page_and_extract_portion_from @board.cards.awaiting_triage.latest.with_golden_first.preloaded
+        rescue => e
+          Rails.logger.error "Error setting up page for stream: #{e.message}"
+          Rails.logger.error e.backtrace.join("\n")
+          @was_in_stream = false # Fall back to not rendering stream
+        end
       end
     rescue => e
       Rails.logger.error "Error reloading board/column after card deletion: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
       # Continue anyway - card is already deleted
+      @source_column = nil
+      @was_in_stream = false
+      @was_postponed = false
+      @was_closed = false
     end
 
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to @board, notice: "Card deleted" }
       format.json { head :no_content }
+    end
+  rescue => e
+    Rails.logger.error "Unexpected error in destroy action: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: "", status: :unprocessable_entity }
+      format.html { redirect_to @board || root_path, alert: "Error deleting card" }
+      format.json { render json: { error: "Failed to delete card" }, status: :unprocessable_entity }
     end
   end
 
