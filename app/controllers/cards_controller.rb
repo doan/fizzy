@@ -71,8 +71,19 @@ class CardsController < ApplicationController
     
     begin
       @card.destroy!
+    rescue ActiveRecord::RecordNotDestroyed => e
+      Rails.logger.error "Card #{@card.number} could not be destroyed: #{e.message}"
+      Rails.logger.error "Card errors: #{@card.errors.full_messages.join(', ')}" if @card.errors.any?
+      Rails.logger.error e.backtrace.join("\n")
+      
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: "", status: :unprocessable_entity }
+        format.html { redirect_to @board || root_path, alert: "Card could not be deleted: #{@card.errors.full_messages.join(', ')}" }
+        format.json { render json: { error: "Failed to delete card", errors: @card.errors.full_messages }, status: :unprocessable_entity }
+      end
+      return
     rescue => e
-      Rails.logger.error "Error destroying card #{@card.number}: #{e.message}"
+      Rails.logger.error "Error destroying card #{@card.number}: #{e.class.name} - #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
       
       respond_to do |format|
