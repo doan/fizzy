@@ -48,38 +48,47 @@ class CardsController < ApplicationController
     @card_article_id = dom_id(@card, :article)
     @card_container_id = dom_id(@card, :card_container)
     
-    @card.destroy!
+    begin
+      @card.destroy!
+    rescue => e
+      Rails.logger.error "Error destroying card #{@card.number}: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      
+      respond_to do |format|
+        format.turbo_stream { head :unprocessable_entity }
+        format.html { redirect_to @board || root_path, alert: "Error deleting card: #{e.message}" }
+        format.json { render json: { error: "Failed to delete card: #{e.message}" }, status: :unprocessable_entity }
+      end
+      return
+    end
     
     # Reload board and column from database after card is destroyed to get fresh associations
     # This ensures associations are up to date when rendering partials
-    @board.reload
-    
-    if source_column_id
-      # Find and reload the column to clear any cached associations
-      @source_column = @board.columns.find_by(id: source_column_id)
-      @source_column&.association(:cards).reset if @source_column
-    else
-      @source_column = nil
-    end
-    
-    # Set up page for stream if needed
-    if @was_in_stream
-      set_page_and_extract_portion_from @board.cards.awaiting_triage.latest.with_golden_first.preloaded
+    begin
+      @board.reload
+      
+      if source_column_id
+        # Find and reload the column to clear any cached associations
+        @source_column = @board.columns.find_by(id: source_column_id)
+        @source_column&.association(:cards).reset if @source_column
+      else
+        @source_column = nil
+      end
+      
+      # Set up page for stream if needed
+      if @was_in_stream
+        set_page_and_extract_portion_from @board.cards.awaiting_triage.latest.with_golden_first.preloaded
+      end
+    rescue => e
+      Rails.logger.error "Error reloading board/column after card deletion: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      # Continue anyway - card is already deleted
     end
 
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to @board, notice: "Card deleted" }
       format.json { head :no_content }
-    end
-  rescue => e
-    Rails.logger.error "Error destroying card #{@card&.number}: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-    
-    respond_to do |format|
-      format.turbo_stream { head :unprocessable_entity }
-      format.html { redirect_to @board || root_path, alert: "Error deleting card" }
-      format.json { render json: { error: "Failed to delete card" }, status: :unprocessable_entity }
     end
   end
 

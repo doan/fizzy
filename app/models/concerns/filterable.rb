@@ -12,6 +12,13 @@ module Filterable
     # FIXME: This is too inefficient to have part of a destroy transaction.
     # Need to find a way to use a job or a single query.
     def remove_from_filters
-      filters.each { it.resource_removed self }
+      filters.find_each do |filter|
+        begin
+          filter.resource_removed self
+        rescue => e
+          Rails.logger.error "Error removing #{self.class.name} #{id} from filter #{filter.id}: #{e.message}"
+          # Continue processing other filters even if one fails
+        end
+      end
     end
 end
