@@ -56,8 +56,8 @@ class CardsController < ApplicationController
       @was_in_stream = @card.awaiting_triage?
       @was_postponed = @card.postponed?
       @was_closed = @card.closed?
-      @card_article_id = dom_id(@card, :article)
-      @card_container_id = dom_id(@card, :card_container)
+      @card_article_id = ActionView::RecordIdentifier.dom_id(@card, :article)
+      @card_container_id = ActionView::RecordIdentifier.dom_id(@card, :card_container)
     rescue => e
       Rails.logger.error "Error capturing card state before deletion: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
@@ -161,15 +161,12 @@ class CardsController < ApplicationController
     end
 
     def ensure_permission_to_administer_card
-      begin
-        unless Current.user.can_administer_card?(@card)
-          head :forbidden
-          return
+      unless Current.user&.can_administer_card?(@card)
+        respond_to do |format|
+          format.turbo_stream { render turbo_stream: "", status: :forbidden }
+          format.html { head :forbidden }
+          format.json { head :forbidden }
         end
-      rescue => e
-        Rails.logger.error "Error checking card administration permission: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
-        head :unprocessable_entity
       end
     end
 
