@@ -1,14 +1,18 @@
-<% if @card_article_id %>
-  <%= turbo_stream.remove @card_article_id %>
-<% end %>
+<%= turbo_stream.remove @card_article_id if @card_article_id %>
+<%= turbo_stream.remove @card_container_id if @card_container_id %>
+
 <% if @card_container_id %>
-  <%= turbo_stream.remove @card_container_id %>
+  <%= turbo_stream.append "body" do %>
+    <script>
+      Turbo.visit("<%= board_path(@board) %>", { action: "replace" });
+    </script>
+  <% end %>
 <% end %>
 
 <% if @source_column %>
-  <%= turbo_stream.replace(dom_id(@source_column), partial: "boards/show/column", method: :morph, locals: { column: @source_column }) %>
+  <%= turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@source_column), partial: "boards/show/column", method: :morph, locals: { column: @source_column }) %>
 <% elsif @was_in_stream && @page %>
-  <%= turbo_stream.replace("the-stream", partial: "boards/show/stream", method: :morph, locals: { board: @board, page: @page }) %>
+  <%= turbo_stream.replace("maybe", partial: "boards/show/stream", method: :morph, locals: { board: @board, page: @page }) %>
 <% elsif @was_postponed %>
   <%= turbo_stream.replace("not-now", partial: "boards/show/not_now", method: :morph, locals: { board: @board }) %>
 <% elsif @was_closed %>
